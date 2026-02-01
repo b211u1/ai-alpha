@@ -1,28 +1,44 @@
 # ai-coding
 
-AI-assisted coding development environment built on [devshells](../devshells).
+AI-assisted coding environments built on [devshells](https://github.com/b211u1/base).
 
-Provides Neovim configurations for various AI coding assistants.
+Every language shell gets an AI-enhanced variant for each provider. Mix languages and AI tools freely.
 
 ## Quick Start
 
 ```bash
-nix develop                # Claude-focused (default)
-nix develop .#copilot      # GitHub Copilot
-nix develop .#codeium      # Codeium (free)
-nix develop .#full         # All providers
+nix develop                          # python + claude (default)
+nix develop .#typescript-copilot     # typescript + copilot
+nix develop .#fullstack-claude       # fullstack + claude
+nix develop .#rust-codeium           # rust + codeium (free)
 ```
 
 ## Available Shells
 
-| Shell | AI Provider | Auth Required |
-|-------|-------------|---------------|
-| `default` | Claude Code CLI | `ANTHROPIC_API_KEY` |
-| `copilot` | GitHub Copilot | `:Copilot auth` |
-| `codeium` | Codeium | `:Codeium Auth` |
-| `full` | Claude + Copilot | Both |
+Every combination of language and AI provider is generated automatically.
 
-## Keymaps
+| Shell | Languages | AI Provider |
+|-------|-----------|-------------|
+| `python-claude` | python, nix | Claude |
+| `python-copilot` | python, nix | GitHub Copilot |
+| `python-codeium` | python, nix | Codeium |
+| `typescript-claude` | typescript, nix | Claude |
+| `typescript-copilot` | typescript, nix | GitHub Copilot |
+| `typescript-codeium` | typescript, nix | Codeium |
+| `csharp-claude` | csharp, nix | Claude |
+| `csharp-copilot` | csharp, nix | GitHub Copilot |
+| `csharp-codeium` | csharp, nix | Codeium |
+| `rust-claude` | rust, nix | Claude |
+| `rust-copilot` | rust, nix | GitHub Copilot |
+| `rust-codeium` | rust, nix | Codeium |
+| `fullstack-claude` | typescript, python, nix | Claude |
+| `fullstack-copilot` | typescript, python, nix | GitHub Copilot |
+| `fullstack-codeium` | typescript, python, nix | Codeium |
+| `dotnet-fullstack-claude` | csharp, typescript, nix | Claude |
+| `dotnet-fullstack-copilot` | csharp, typescript, nix | GitHub Copilot |
+| `dotnet-fullstack-codeium` | csharp, typescript, nix | Codeium |
+
+## AI Keymaps
 
 ### Claude (`<leader>c`)
 
@@ -50,42 +66,32 @@ nix develop .#full         # All providers
 | `<M-]>` / `<M-[>` | Cycle suggestions |
 | `<leader>cC` | Codeium chat |
 
-## Setup
+## Authentication
 
 ### Claude
-
-Set your API key:
 ```bash
 export ANTHROPIC_API_KEY="sk-ant-..."
 ```
 
-Or add to your shell config.
-
 ### Copilot
-
-Run inside Neovim:
 ```vim
 :Copilot auth
 ```
 
 ### Codeium
-
-Run inside Neovim:
 ```vim
 :Codeium Auth
 ```
 
-## Customization
+## How It Works
 
-Edit `flake.nix` to:
-- Add more AI providers
-- Change default models
-- Modify keymaps
-- Add project-specific tools
+The flake defines two dimensions:
+
+1. **`shellLanguages`** — language combinations (python, typescript, fullstack, etc.)
+2. **`aiProviders`** — AI tools (claude, copilot, codeium)
+
+Every shell is generated as `{language}-{provider}` by mapping over both. To add a new language or provider, add one entry and all combinations are created.
 
 ## Dependencies
 
-This flake imports [devshells](../devshells) which provides:
-- Base Neovim configuration (Cyberdream theme, LSP, etc.)
-- Language modules (Python, TypeScript, Nix, etc.)
-- Core tools (git, ripgrep, fzf, etc.)
+Imports [devshells](https://github.com/b211u1/base) via `flakeModules.default` for base Neovim config, language modules, and core tooling.
