@@ -267,7 +267,10 @@
 
             shellHook = ''
               ${sopsShellHook}
-              echo "🤖 ${provider.label} AI Keymaps:"
+              # Set PS1 to reflect the current AI shell
+              export PS1="\[\033[1;34m\][${shellName}-${providerName}]\[\033[0m\] \[\033[1;32m\]\w\[\033[0m\] $ "
+              echo ""
+              echo "🤖 ${provider.label} Dev Shell (${shellName} + nix)"
               ${if provider.needsApiKey or false then ''
                 if [ -n "''${ANTHROPIC_API_KEY:-}" ]; then
                   echo "✓ ANTHROPIC_API_KEY loaded"
@@ -275,6 +278,8 @@
                   echo "⚠️  ANTHROPIC_API_KEY not set - see secrets/README.md"
                 fi
               '' else ""}
+              echo ""
+              echo "Keymaps:"
               ${provider.shellHook}
               echo ""
             '';

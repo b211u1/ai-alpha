@@ -7,11 +7,13 @@ Every language shell gets an AI-enhanced variant for each provider. Mix language
 ## Quick Start
 
 ```bash
-nix develop                          # python + claude (default)
-nix develop .#typescript-copilot     # typescript + copilot
-nix develop .#fullstack-claude       # fullstack + claude
-nix develop .#rust-codeium           # rust + codeium (free)
+nix develop                          # python + nix + claude (default)
+nix develop .#typescript-copilot     # typescript + nix + copilot
+nix develop .#fullstack-claude       # fullstack + nix + claude
+nix develop .#rust-codeium           # rust + nix + codeium (free)
 ```
+
+Your shell prompt (PS1) will reflect the current environment, e.g., `[python-claude] ~/project $`
 
 ## Available Shells
 
@@ -114,10 +116,14 @@ export ANTHROPIC_API_KEY="sk-ant-..."
 
 The flake defines two dimensions:
 
-1. **`shellLanguages`** — language combinations (python, typescript, fullstack, etc.)
+1. **`shellLanguages`** — language combinations (python, typescript, fullstack, etc.) — all include nix by default
 2. **`aiProviders`** — AI tools (claude, copilot, codeium)
 
 Every shell is generated as `{language}-{provider}` by mapping over both. To add a new language or provider, add one entry and all combinations are created.
+
+When you enter a shell:
+- **PS1** is set to show the current environment (e.g., `[python-claude]`)
+- **Shell hook** displays the AI provider, available keymaps, and API key status
 
 ## Dependencies
 
