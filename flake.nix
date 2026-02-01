@@ -5,9 +5,13 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-parts.url = "github:hercules-ci/flake-parts";
     devshells.url = "github:b211u1/base/flake-parts";
+
+    # sops-nix for secret management
+    sops-nix.url = "github:Mic92/sops-nix";
+    sops-nix.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = inputs@{ flake-parts, devshells, nixpkgs, ... }:
+  outputs = inputs@{ flake-parts, devshells, nixpkgs, sops-nix, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } {
       systems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
 
@@ -15,6 +19,35 @@
 
       perSystem = { config, pkgs, lib, ... }:
         let
+          # ============================================
+          # SOPS SECRET MANAGEMENT
+          # ============================================
+
+          sopsPackages = with pkgs; [ sops age ];
+
+          # Helper script to load secrets from sops-encrypted file
+          loadSecretsScript = pkgs.writeShellScript "load-secrets" ''
+            SECRETS_FILE="''${SECRETS_FILE:-./secrets/secrets.yaml}"
+            if [ -f "$SECRETS_FILE" ]; then
+              # Check if age key exists
+              AGE_KEY_FILE="''${SOPS_AGE_KEY_FILE:-$HOME/.config/sops/age/keys.txt}"
+              if [ -f "$AGE_KEY_FILE" ]; then
+                export SOPS_AGE_KEY_FILE="$AGE_KEY_FILE"
+                # Decrypt and export each secret as an environment variable
+                eval "$(${pkgs.sops}/bin/sops --decrypt --output-type dotenv "$SECRETS_FILE" 2>/dev/null || echo "")"
+              else
+                echo "⚠️  No age key found at $AGE_KEY_FILE"
+                echo "   Run: mkdir -p ~/.config/sops/age && age-keygen -o ~/.config/sops/age/keys.txt"
+              fi
+            fi
+          '';
+
+          # Common shell hook for sops integration
+          sopsShellHook = ''
+            # Load secrets from sops-encrypted file if available
+            source ${loadSecretsScript}
+          '';
+
           # ============================================
           # AI PROVIDER MODULES
           # ============================================
@@ -154,6 +187,7 @@
             claude = {
               module = claudeModule;
               label = "Claude";
+              needsApiKey = true;
               shellHook = ''
                 echo "  <leader>cc  Claude Code CLI"
                 echo "  <leader>ct  Claude chat"
@@ -164,6 +198,7 @@
             copilot = {
               module = copilotModule;
               label = "GitHub Copilot";
+              needsApiKey = false;
               shellHook = ''
                 echo "  <M-l>       Accept suggestion"
                 echo "  <M-]>/<M-[> Cycle suggestions"
@@ -175,6 +210,7 @@
             codeium = {
               module = codeiumModule;
               label = "Codeium (Free)";
+              needsApiKey = false;
               shellHook = ''
                 echo "  <C-g>       Accept suggestion"
                 echo "  <M-]>/<M-[> Cycle suggestions"
@@ -227,8 +263,18 @@
               ${providerName} = provider.module;
             };
 
+            extraPackages = sopsPackages;
+
             shellHook = ''
+              ${sopsShellHook}
               echo "🤖 ${provider.label} AI Keymaps:"
+              ${if provider.needsApiKey or false then ''
+                if [ -n "''${ANTHROPIC_API_KEY:-}" ]; then
+                  echo "✓ ANTHROPIC_API_KEY loaded"
+                else
+                  echo "⚠️  ANTHROPIC_API_KEY not set - see secrets/README.md"
+                fi
+              '' else ""}
               ${provider.shellHook}
               echo ""
             '';

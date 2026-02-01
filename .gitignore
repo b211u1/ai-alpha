@@ -1,0 +1,24 @@
+# sops - never commit decrypted secrets
+*.decrypted
+*.decrypted.*
+secrets/*.decrypted
+secrets/*.plaintext
+
+# age private keys (should never be in repo)
+*.age.key
+keys.txt
+
+# Environment files with secrets
+.env
+.env.local
+.env.*.local
+
+# Editor backups that might contain decrypted secrets
+*~
+*.swp
+*.swo
+.*.swp
+
+# Nix build artifacts
+result
+result-*

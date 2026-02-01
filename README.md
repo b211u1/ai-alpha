@@ -68,7 +68,34 @@ Every combination of language and AI provider is generated automatically.
 
 ## Authentication
 
+### Secret Management (sops-nix)
+
+This project uses [sops](https://github.com/getsops/sops) with age encryption for secure API key management.
+
+**Quick Setup:**
+
+```bash
+# 1. Generate age keypair (one-time)
+mkdir -p ~/.config/sops/age
+age-keygen -o ~/.config/sops/age/keys.txt
+
+# 2. Get your public key and add to .sops.yaml
+age-keygen -y ~/.config/sops/age/keys.txt
+# Edit .sops.yaml with your public key
+
+# 3. Create and encrypt secrets
+cp secrets/secrets.yaml.example secrets/secrets.yaml
+# Edit secrets.yaml with your ANTHROPIC_API_KEY
+sops --encrypt --in-place secrets/secrets.yaml
+```
+
+See [secrets/README.md](secrets/README.md) for detailed instructions.
+
 ### Claude
+
+The `ANTHROPIC_API_KEY` is loaded automatically from encrypted secrets when entering the shell.
+
+Alternative: set manually in your shell:
 ```bash
 export ANTHROPIC_API_KEY="sk-ant-..."
 ```
