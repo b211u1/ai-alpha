@@ -56,12 +56,12 @@
             name = "claude";
 
             plugins = with pkgs.vimPlugins; [
-              # avante-nvim
-              # codecompanion-nvim
+              avante-nvim
+              codecompanion-nvim
             ];
 
             packages = with pkgs; [
-              # claude-code
+              claude-code
             ];
 
             config = ''
