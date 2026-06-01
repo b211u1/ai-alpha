@@ -61,7 +61,7 @@
             ];
 
             packages = with pkgs; [
-              # claude-code
+              claude-code
             ];
 
             config = ''
@@ -189,6 +189,14 @@
               label = "Claude";
               needsApiKey = true;
               shellHook = ''
+                # Pin Claude Code to the latest models.
+                # Override per-session with `claude --model <alias>` or `/model`.
+                # ANTHROPIC_SMALL_FAST_MODEL is deprecated; use ANTHROPIC_DEFAULT_HAIKU_MODEL.
+                export ANTHROPIC_MODEL="''${ANTHROPIC_MODEL:-claude-opus-4-8}"
+                export ANTHROPIC_DEFAULT_OPUS_MODEL="''${ANTHROPIC_DEFAULT_OPUS_MODEL:-claude-opus-4-8}"
+                export ANTHROPIC_DEFAULT_SONNET_MODEL="''${ANTHROPIC_DEFAULT_SONNET_MODEL:-claude-sonnet-4-6}"
+                export ANTHROPIC_DEFAULT_HAIKU_MODEL="''${ANTHROPIC_DEFAULT_HAIKU_MODEL:-claude-haiku-4-5-20251001}"
+                echo "  claude      Claude Code CLI (model: $ANTHROPIC_MODEL)"
                 echo "  <leader>cc  Claude Code CLI"
                 echo "  <leader>ct  Claude chat"
                 echo "  <leader>ce  Explain selection (visual)"
