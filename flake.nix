@@ -9,6 +9,10 @@
     # sops-nix for secret management
     sops-nix.url = "github:Mic92/sops-nix";
     sops-nix.inputs.nixpkgs.follows = "nixpkgs";
+
+    # Claude Code - community flake that tracks releases hourly
+    # (nixpkgs-unstable lags behind, causing subscription detection bugs)
+    claude-code.url = "github:ryoppippi/nix-claude-code";
   };
 
   outputs = inputs@{ flake-parts, devshells, nixpkgs, sops-nix, ... }:
@@ -17,7 +21,7 @@
 
       imports = [ devshells.flakeModules.default ];
 
-      perSystem = { config, pkgs, lib, ... }:
+      perSystem = { config, pkgs, lib, system, ... }:
         let
           # ============================================
           # SOPS SECRET MANAGEMENT
@@ -60,8 +64,8 @@
               # codecompanion-nvim
             ];
 
-            packages = with pkgs; [
-              # claude-code
+            packages = [
+              inputs.claude-code.packages.${system}.default
             ];
 
             config = ''
