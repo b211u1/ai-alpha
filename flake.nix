@@ -13,6 +13,13 @@
     # Claude Code - community flake that tracks releases hourly
     # (nixpkgs-unstable lags behind, causing subscription detection bugs)
     claude-code.url = "github:ryoppippi/nix-claude-code";
+
+    # OpenSpec - spec-driven development CLI; pairs with Claude Code
+    # (its `openspec init` generates Claude slash commands/skills).
+    # Intentionally NOT following our nixpkgs: OpenSpec builds against
+    # nodejs_20, which recent nixpkgs can mark insecure, so we let it
+    # resolve its own pinned nixpkgs (same as claude-code above).
+    openspec.url = "github:Fission-AI/OpenSpec";
   };
 
   outputs = inputs@{ flake-parts, devshells, nixpkgs, sops-nix, ... }:
@@ -66,6 +73,7 @@
 
             packages = [
               inputs.claude-code.packages.${system}.default
+              inputs.openspec.packages.${system}.default
             ];
 
             config = ''
@@ -197,6 +205,8 @@
                 echo "  <leader>ct  Claude chat"
                 echo "  <leader>ce  Explain selection (visual)"
                 echo "  <leader>cr  Review selection (visual)"
+                echo ""
+                echo "  openspec    Spec-driven dev CLI — run: openspec init"
               '';
             };
             copilot = {
