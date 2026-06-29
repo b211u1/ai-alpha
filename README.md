@@ -49,6 +49,10 @@ Every combination of language and AI provider is generated automatically.
 | `<leader>ce` | Explain selection (visual) |
 | `<leader>cr` | Review selection (visual) |
 
+Claude shells also bundle the [OpenSpec](https://github.com/Fission-AI/OpenSpec) CLI for
+spec-driven development. Run `openspec init` in your project to generate Claude slash commands
+and skills, then propose / apply / archive changes against your specs.
+
 ### Copilot
 
 | Key | Action |
